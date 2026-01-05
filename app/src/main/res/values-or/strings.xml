@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeddingCraft</string>
+    <string name="tag_line_slok">\"Blessed beginnings under the divine gaze of Lord Ganesha. You\'re invited to witness a sacred celebration.\"</string>
+    <string name="addnew">AddNew</string>
+    <string name="todo">TODO</string>
+    <string name="invitation_title">ନିମନ୍ତ୍ରଣ ପତ୍ର 💍</string>
+    <string name="hint_bride_name">ବଧୁର ନାମ</string>
+    <string name="hint_bride_parents">ବଧୁଙ୍କର ପିତାମାତାଙ୍କ ନାମ</string>
+    <string name="hint_groom_name">ବରଙ୍କ ନାମ</string>
+    <string name="hint_groom_parents">ବରଙ୍କର ପିତାମାତାଙ୍କ ନାମ</string>
+    <string name="hint_date">ବିବାହ ତାରିଖ (ଯେପରିକି ୨୮ ଡିସେମ୍ବର ୨୦୨୫)</string>
+    <string name="hint_time">ବିବାହ ସମୟ (ଯେପରିକି ସନ୍ଧ୍ୟା ୬:୦୦)</string>
+    <string name="hint_venue">ସ୍ଥଳୀ ଠିକଣା</string>
+    <string name="hint_host">ଆମନ୍ତ୍ରଣକାରୀଙ୍କ ପରିବାର</string>
+    <string name="hint_rsvp">ଯୋଗାଯୋଗ ସୂଚନା</string>
+    <string name="hint_quote">ଉଦ୍ବୋଧନ ବା ଶୁଭାଶୀଷ (ଇଚ୍ଛାମୁଳକ)</string>
+    <string name="add_event">ଅନ୍ୟ କାର୍ଯ୍ୟସୂଚୀ ଯୋଡନ୍ତୁ</string>
+    <string name="generate_card">ପତ୍ର ତିଆରି କରନ୍ତୁ</string>
+    <string name="other_events">ଅନ୍ୟ କାର୍ଯ୍ୟସୂଚୀ</string>
+    <string name="contact_info">Contact Info</string>
+    <string name="venue_address">ଠିକଣା</string>
+    <string name="event_name">କାର୍ଯ୍ୟସୂଚୀର ନାମ</string>
+    <string name="time">ସମୟ</string>
+    <string name="my_cards">My Cards</string>
+    <string name="contacts">Contacts</string>
+    <string name="share_app">Share App</string>
+    <string name="events">Events</string>
+    <string name="venues">Venues</string>
+    <string name="add_new">Add New</string>
+    <string name="share_wedding_card">Share Invitation Card</string>
+    <string name="notifications">Notifications</string>
+    <string name="empty_draft">Empty Draft</string>
+</resources>

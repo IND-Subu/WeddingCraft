@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_viewer_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.subu.Helper.CardViewerActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/card_viewer_toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        app:title="@string/app_name"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_back"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/fold_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?actionBarSize"
+        app:layout_constraintTop_toTopOf="@id/card_viewer_toolBar"
+        android:background="@color/Primary_gold">
+    </androidx.viewpager2.widget.ViewPager2>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

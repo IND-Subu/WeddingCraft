@@ -1,0 +1,62 @@
+<resources>
+
+    <!-- 🟨 Buttons -->
+    <style name="WeddingCraftButton" parent="android:Widget.Button">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <!-- 🟦 Text Headings -->
+    <style name="WeddingCraftHeading" parent="android:TextAppearance.Medium">
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <!-- 📝 Body Text -->
+    <style name="WeddingCraftBodyText" parent="android:TextAppearance.Small">
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <!-- 🟪 Image Buttons (e.g., toolbar icons) -->
+    <style name="WeddingCraftIconButton" parent="android:Widget.ImageButton">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:tint">?attr/colorPrimary</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <!-- 📦 Card Background Container -->
+    <style name="WeddingCraftCardContainer">
+        <item name="android:background">@android:color/white</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <style name="FullScreenDialog" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+
+    <style name="BottomSheetDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/BottomSheetAnimation</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+
+</resources>

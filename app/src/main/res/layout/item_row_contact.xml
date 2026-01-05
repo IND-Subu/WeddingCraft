@@ -1,0 +1,37 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/contactDp"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:src="@drawable/user_dp"
+        app:tint="@color/teal_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/contactName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textColor="@color/Text_primary_gold"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@+id/contactDp"
+        app:layout_constraintTop_toTopOf="@+id/contactDp" />
+
+    <TextView
+        android:id="@+id/contactNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/Text_primary_gold"
+        android:textSize="16sp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/contactDp"
+        app:layout_constraintStart_toEndOf="@+id/contactDp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:layout_marginTop="30dp"
+    android:background="#FFF7F0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Decorative Header -->
+        <TextView
+            android:id="@+id/titleTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/invitation_title"
+            android:textColor="#B86B77"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:fontFamily="cursive"
+            android:paddingBottom="16dp" />
+
+        <!-- Bride & Groom Names -->
+        <EditText
+            android:id="@+id/brideNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_bride_name"
+            android:inputType="textPersonName"
+            android:autofillHints="name"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText android:id="@+id/brideParentsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="name"
+            android:inputType="textPersonName"
+            android:hint="@string/hint_bride_parents"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Spinner android:id="@+id/bridePositionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@drawable/edit_text_bg"
+            android:entries="@array/bride_position_options"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/groomNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_groom_name"
+            android:inputType="textPersonName"
+            android:autofillHints="name"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText android:id="@+id/groomParentsInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="name"
+            android:inputType="textPersonName"
+            android:hint="@string/hint_groom_parents"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Spinner android:id="@+id/groomPositionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@drawable/edit_text_bg"
+            android:entries="@array/groom_position_options"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Date and Time -->
+        <EditText
+            android:id="@+id/dateInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_date"
+            android:inputType="text"
+            android:autofillHints="wedding date"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            tools:ignore="TextFields" />
+
+        <EditText
+            android:id="@+id/timeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_time"
+            android:inputType="time"
+            android:autofillHints="time"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Venue -->
+        <EditText
+            android:id="@+id/venueInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/venue_address"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:autofillHints="postalAddress"
+            android:inputType="textPostalAddress"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Host Information -->
+        <EditText
+            android:id="@+id/hostInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_host"
+            android:inputType="textPersonName"
+            android:autofillHints="host"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Mantra Selection -->
+        <Spinner
+            android:id="@+id/mantraSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:entries="@array/mantra_options"
+            android:background="@drawable/edit_text_bg"
+            android:layout_marginBottom="12dp" />
+
+        <!-- RSVP (optional) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/edit_text_bg"
+            android:layout_marginBottom="12dp">
+
+            <Spinner
+                android:id="@+id/contactTypeSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/contact_types"
+                android:layout_weight="1"
+                android:elevation="10dp"
+                android:padding="8dp"/>
+
+            <EditText
+                android:id="@+id/rsvpInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:autofillHints="contact"
+                android:inputType="text|textWebEmailAddress"
+                android:hint="@string/contact_info"
+                android:background="@drawable/edit_text_bg"
+                android:padding="12dp" />
+        </LinearLayout>
+
+
+        <!-- Decorative Quote (optional) -->
+        <EditText
+            android:id="@+id/quoteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="Quotes"
+            android:hint="@string/hint_quote"
+            android:background="@drawable/edit_text_bg"
+            android:inputType="text"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Dynamic Events Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/other_events"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:textColor="#B86B77"/>
+
+        <LinearLayout
+            android:id="@+id/eventContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+        <Button
+            android:id="@+id/addEventBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_event"
+            android:backgroundTint="#E9B7A0"
+            android:textColor="#000000"
+            android:layout_marginBottom="24dp"/>
+        <!-- Submit Button -->
+        <Button
+            android:id="@+id/btnGenerateCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/generate_card"
+            android:backgroundTint="#B86B77"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

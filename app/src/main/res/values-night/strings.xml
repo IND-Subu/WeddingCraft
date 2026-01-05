@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_cards">My Cards</string>
+    <string name="contacts">Contacts</string>
+    <string name="share_wedding_card">Share Invitation Card</string>
+    <string name="notifications">Notifications</string>
+    <string name="empty_draft">Empty Draft</string>
+</resources>

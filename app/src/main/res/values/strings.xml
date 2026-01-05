@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">WeddingCraft</string>
+    <string name="tag_line_slok">"Blessed beginnings under the divine gaze of Lord Ganesha. You are invited to witness a sacred celebration."</string>
+    <string name="addnew">AddNew</string>
+    <string name="todo">TODO</string>
+    <string name="invitation_title">Invitation Details 💍</string>
+    <string name="hint_bride_name">Bride Name</string>
+    <string name="hint_bride_parents">Bride Parents Names</string>
+    <string name="hint_groom_name">Groom Name</string>
+    <string name="hint_groom_parents">Groom Parents Names</string>
+    <string name="hint_date">Wedding Date (e.g. 28 Dec 2025)</string>
+    <string name="hint_time">Wedding Time (e.g. 6:00 PM)</string>
+    <string name="hint_venue">Venue Address</string>
+    <string name="hint_host">Invited by / Host Family</string>
+    <string name="hint_rsvp">Contact Info</string>
+    <string name="hint_quote">Wedding Quote or Blessing (optional)</string>
+    <string name="add_event">Add Another Event</string>
+    <string name="generate_card">Generate Wedding Card</string>
+    <string name="other_events">Other Wedding Events</string>
+    <string name="contact_info">Contact Info</string>
+    <string name="venue_address">Venue Address</string>
+    <string name="event_name">Event Name</string>
+    <string name="time">Time</string>
+    <string name="share_app">Share App</string>
+    <string name="my_cards">My Cards</string>
+    <string name="events">Events</string>
+    <string name="venues">Venues</string>
+    <string name="add_new">Add New</string>
+    <string name="contacts">Contacts</string>
+    <string name="share_wedding_card">Share Invitation Card</string>
+    <string name="delivery_status">Delivery Status</string>
+    <string name="notifications">Notifications</string>
+    <string name="empty_draft">Empty Draft</string>
+</resources>

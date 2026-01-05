@@ -1,0 +1,49 @@
+[versions]
+agp = "8.13.2"
+firebaseAppcheckDebug = "18.0.0"
+firebaseBom = "33.16.0"
+firebaseFirestore = "25.1.4"
+firebaseFunctions = "21.2.1"
+firebaseMessaging = "24.1.2"
+firebaseStorageKtx = "21.0.2"
+gson = "2.11.0"
+integrity = "1.4.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.1"
+material = "1.12.0"
+activity = "1.10.1"
+constraintlayout = "2.2.1"
+roomRuntime = "2.7.2"
+firebaseDatabase = "21.0.0"
+swiperefreshlayout = "1.1.0"
+
+[libraries]
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-appcheck = { module = "com.google.firebase:firebase-appcheck" }
+firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
+firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-functions = { module = "com.google.firebase:firebase-functions", version.ref = "firebaseFunctions" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
+firebase-storage-ktx = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+google-firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug", version.ref = "firebaseAppcheckDebug" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+integrity = { module = "com.google.android.play:integrity", version.ref = "integrity" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+

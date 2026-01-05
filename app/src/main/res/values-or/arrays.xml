@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="mantra_options">
+        <item>ମନ୍ତ୍ର ଚୟନ କରନ୍ତୁ</item>
+        <item>|| ଶ୍ରୀ ଶ୍ରୀ ଜଗନ୍ନାଥାୟ ନମଃ ||</item>
+        <item>|| ଶୁଭମ ଭବତୁ ||</item>
+    </string-array>
+
+    <string-array name="groom_position_options">
+        <item>ବରଙ୍କ କ୍ରମ</item>
+        <item>କନିଷ୍ଠ ପୁତ୍ର</item>
+        <item>ଜ୍ୟୋଷ୍ଠ ପୁତ୍ର</item>
+        <item>ମାଧ୍ୟମ ପୁତ୍ର</item>
+    </string-array>
+
+    <string-array name="bride_position_options">
+        <item>କନ୍ୟାଙ୍କ କ୍ରମ</item>
+        <item>କନିଷ୍ଠ କନ୍ୟା</item>
+        <item>ଜ୍ୟୋଷ୍ଠ କନ୍ୟା</item>
+        <item>ମାଧ୍ୟମ କନ୍ୟା</item>
+    </string-array>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="@color/Primary_gold"
+    android:backgroundTintMode="multiply"
+    android:background="@drawable/royal_theme_01"
+    tools:context=".MainActivity">
+
+    <!--<a href="https://www.freepik.com/free-psd/golden-glitter-circle-frame-luxurious-design-elegant-sparkle-border-round-photo-frame-mockup-template_410859788.htm">
+    Image by xadartstudio on Freepik</a> -->
+    <ImageView
+        android:id="@+id/embroid_circle"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="70dp"
+        android:elevation="50dp"
+        android:contentDescription="embroid_circle"
+        android:src="@drawable/embroid_circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/embroid_ganesh"
+        app:layout_constraintBottom_toBottomOf="@+id/embroid_circle"
+        app:layout_constraintEnd_toEndOf="@+id/embroid_circle"
+        app:layout_constraintStart_toStartOf="@+id/embroid_circle"
+        app:layout_constraintTop_toTopOf="@+id/embroid_circle" />
+
+    <TextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="@string/tag_line_slok"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"
+        android:fontFamily="@font/vedic_font"
+        android:gravity="center"
+        android:lineHeight="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/embroid_circle"
+        app:layout_constraintVertical_bias="0.173" />
+</androidx.constraintlayout.widget.ConstraintLayout>

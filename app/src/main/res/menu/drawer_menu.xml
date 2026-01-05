@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group>
+        <item
+            android:id="@+id/add_new_card"
+            android:icon="@drawable/ic_add"
+            android:title="@string/add_new" />
+
+        <item
+            android:id="@+id/my_cards"
+            android:icon="@drawable/ic_apps"
+            android:title="@string/my_cards" />
+
+        <item android:id="@+id/notification"
+            android:icon="@drawable/ic_notifications"
+            android:title="@string/notifications" />
+    </group>
+    <item
+        android:id="@+id/shareApp"
+        android:icon="@drawable/ic_share"
+        android:title="@string/share_app" />
+</menu>

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "667146075094",
+    "firebase_url": "https://weddingcraft-dev-default-rtdb.firebaseio.com",
+    "project_id": "weddingcraft-dev",
+    "storage_bucket": "weddingcraft-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667146075094:android:cff8c47ff5820bb9b54277",
+        "android_client_info": {
+          "package_name": "com.subu.weddingcraft"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdx_T8VH0kHDfmwgv9_RfasuH5hAUFO98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

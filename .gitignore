@@ -1,0 +1,48 @@
+# =========================================================
+# ANDROID / GRADLE — ABSOLUTE RULES
+# =========================================================
+
+# Global & project Gradle caches
+.gradle/
+**/.gradle/
+gradle/caches/
+gradle/wrapper/dists/
+
+# Build outputs
+build/
+**/build/
+
+# =========================================================
+# KEEP ONLY GRADLE WRAPPER ESSENTIALS
+# =========================================================
+!gradle/
+!gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+
+# =========================================================
+# ANDROID STUDIO / INTELLIJ
+# =========================================================
+.idea/
+*.iml
+local.properties
+
+# =========================================================
+# NATIVE BUILD / NDK
+# =========================================================
+.externalNativeBuild/
+.cxx/
+
+# =========================================================
+# CAPTURES & LOGS
+# =========================================================
+captures/
+*.log
+
+# =========================================================
+# OS FILES
+# =========================================================
+.DS_Store
+Thumbs.db

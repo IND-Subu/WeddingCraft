@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="contact_types">
+        <item>Mobile</item>
+        <item>Email</item>
+        <item>Website</item>
+        <item>WhatsApp</item>
+    </string-array>
+
+    <string-array name="mantra_options">
+        <item>Mantras</item>
+        <item>|| Shree Shree Jagannatha Namah ||</item>
+        <item>|| Shubham Bhavatu ||</item>
+    </string-array>
+
+    <string-array name="groom_position_options">
+        <item>Choose Position</item>
+        <item>Youngest Son</item>
+        <item>Oldest Son</item>
+        <item>Middle Son</item>
+    </string-array>
+
+    <string-array name="bride_position_options">
+        <item>Choose Position</item>
+        <item>Youngest Daughter</item>
+        <item>Oldest Daughter</item>
+        <item>Middle Daughter</item>
+    </string-array>
+</resources>

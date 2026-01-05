@@ -1,0 +1,62 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base Material Theme (used by default if needed) -->
+    <style name="Theme.WeddingCraft" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <!-- AppCompat base theme without ActionBar -->
+    <style name="Theme.WeddingCraft.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <!-- Gold Theme -->
+    <style name="Theme.WeddingCraft.Gold" parent="Theme.WeddingCraft.Base">
+        <item name="colorPrimary">@color/Primary_gold</item>
+        <item name="colorPrimaryDark">@color/Primary_gold</item>
+        <item name="colorAccent">@color/Secondary_gold</item>
+
+        <item name="android:textColorPrimary">@color/Text_primary_gold</item>
+
+        <item name="android:windowBackground">@color/Background_gold</item>
+        <item name="android:navigationBarColor">@color/Primary_gold</item>
+        <item name="android:statusBarColor">@color/Primary_gold</item>
+    </style>
+
+    <!-- Ivory Theme -->
+    <style name="Theme.WeddingCraft.Ivory" parent="Theme.WeddingCraft.Base">
+        <item name="colorPrimary">@color/Primary_ivory</item>
+        <item name="colorPrimaryDark">@color/Primary_ivory</item>
+        <item name="colorAccent">@color/Secondary_ivory</item>
+
+        <item name="android:textColorPrimary">@color/Text_primary_ivory</item>
+
+        <item name="android:windowBackground">@color/Background_ivory</item>
+        <item name="android:navigationBarColor">@color/Primary_ivory</item>
+        <item name="android:statusBarColor">@color/Primary_ivory</item>
+    </style>
+
+    <!-- Lavender Theme -->
+    <style name="Theme.WeddingCraft.Lavender" parent="Theme.WeddingCraft.Base">
+        <item name="colorPrimary">@color/Primary_lavender</item>
+        <item name="colorPrimaryDark">@color/Primary_lavender</item>
+        <item name="colorAccent">@color/Secondary_lavender</item>
+
+        <item name="android:textColorPrimary">@color/Text_primary_lavender</item>
+
+        <item name="android:windowBackground">@color/Background_lavender</item>
+        <item name="android:navigationBarColor">@color/Primary_lavender</item>
+        <item name="android:statusBarColor">@color/Primary_lavender</item>
+    </style>
+
+</resources>
