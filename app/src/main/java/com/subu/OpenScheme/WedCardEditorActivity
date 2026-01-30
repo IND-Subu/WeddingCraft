@@ -1,0 +1,1125 @@
+package com.subu.OpenScheme;
+
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.subu.Helper.DraggableTextView;
+import com.subu.Helper.EditorElement;
+import com.subu.weddingcraft.R;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Stack;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+/**
+ * Visual Wedding Card Editor - Mini Canva for Wedding Cards
+ * Features: Drag-drop, fonts, colors, undo/redo, fold preservation, card generation
+ */
+public class WedCardEditorActivity extends AppCompatActivity {
+    private static final String TAG = "WedCardEditor";
+    // Fold management - STORES EACH FOLD'S DESIGN SEPARATELY
+    private final HashMap<String, List<EditorElement>> foldDesigns = new HashMap<>();
+    // Undo/Redo stacks - PER FOLD
+    private final HashMap<String, Stack<EditorAction>> undoStacks = new HashMap<>();
+    private final HashMap<String, Stack<EditorAction>> redoStacks = new HashMap<>();
+    // Canvas area
+    private FrameLayout canvas;
+    private ImageView backgroundImage;
+    // Toolbars
+    private LinearLayout topToolbar;
+    private LinearLayout floatingToolbar;
+    // Current selection
+    private View selectedElement;
+    private String currentFold = "front";
+    private String theme;
+    private String eventType;
+    private ImageButton btnGenerate;
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_wedcard_editor);
+
+        theme = getIntent().getStringExtra("theme");
+        eventType = getIntent().getStringExtra("type");
+        if (theme == null) theme = "royal";
+        if (eventType == null) eventType = "Marriage";
+
+        // Initialize fold designs for all folds
+        initializeFoldDesigns();
+
+        // Initialize views
+        canvas = findViewById(R.id.editorCanvas);
+        backgroundImage = findViewById(R.id.backgroundImage);
+        topToolbar = findViewById(R.id.topToolbar);
+        floatingToolbar = findViewById(R.id.floatingToolbar);
+
+        // Load initial background
+        loadBackground(theme, currentFold);
+
+        // Setup toolbars
+        setupTopToolbar();
+        setupBottomToolbar();
+        setupFloatingToolbar();
+
+        // Canvas click to deselect
+        canvas.setOnClickListener(v -> deselectAll());
+    }
+
+    private void initializeFoldDesigns() {
+        String[] folds = {"front", "left", "right", "back"};
+        for (String fold : folds) {
+            foldDesigns.put(fold, new ArrayList<>());
+            undoStacks.put(fold, new Stack<>());
+            redoStacks.put(fold, new Stack<>());
+        }
+    }
+
+    private void loadBackground(String theme, String fold) {
+        try {
+            InputStream is = getAssets().open(theme + "/" + fold + ".jpg");
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            backgroundImage.setImageBitmap(bitmap);
+            is.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to load background", e);
+            backgroundImage.setBackgroundColor(Color.parseColor("#FFF7F0"));
+        }
+    }
+
+    private void setupTopToolbar() {
+        // Undo button
+        ImageButton btnUndo = findViewById(R.id.btnUndo);
+        btnUndo.setOnClickListener(v -> undo());
+
+        // Redo button
+        ImageButton btnRedo = findViewById(R.id.btnRedo);
+        btnRedo.setOnClickListener(v -> redo());
+
+        // Generate button - NEW!
+        btnGenerate = findViewById(R.id.btnGenerate);
+        btnGenerate.setOnClickListener(v -> showGenerateOptions());
+
+        // Close button
+        ImageButton btnClose = findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(v -> onBackPressed());
+    }
+
+    private void setupBottomToolbar() {
+        ImageButton btnAddText = findViewById(R.id.btnAddText);
+        btnAddText.setOnClickListener(v -> addTextElement());
+
+        ImageButton btnAddElement = findViewById(R.id.btnAddElement);
+        btnAddElement.setOnClickListener(v -> showElementPicker());
+
+        ImageButton btnBackground = findViewById(R.id.btnChangeBackground);
+        btnBackground.setOnClickListener(v -> showBackgroundPicker());
+
+        ImageButton btnChangeFold = findViewById(R.id.btnChangeFold);
+        btnChangeFold.setOnClickListener(v -> showFoldSelector());
+    }
+
+    private void setupFloatingToolbar() {
+        floatingToolbar.setVisibility(View.GONE);
+
+        ImageButton btnDelete = findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(v -> deleteSelected());
+
+        ImageButton btnEdit = findViewById(R.id.btnEditText);
+        btnEdit.setOnClickListener(v -> editSelectedText());
+
+        ImageButton btnFont = findViewById(R.id.btnFont);
+        btnFont.setOnClickListener(v -> showFontPicker());
+
+        ImageButton btnColor = findViewById(R.id.btnColor);
+        btnColor.setOnClickListener(v -> showColorPicker());
+
+        ImageButton btnSize = findViewById(R.id.btnSize);
+        btnSize.setOnClickListener(v -> showSizePicker());
+
+        ImageButton btnBringFront = findViewById(R.id.btnBringFront);
+        btnBringFront.setOnClickListener(v -> bringToFront());
+
+        ImageButton btnDuplicateElement = findViewById(R.id.btnDuplicateElement);
+        btnDuplicateElement.setOnClickListener(v -> duplicateSelectedContent());
+
+        ImageButton btnAlignLeft = findViewById(R.id.btnAlignLeft);
+        btnAlignLeft.setOnClickListener(v -> textAlign(Gravity.START));
+
+        ImageButton btnAlignRight = findViewById(R.id.btnAlignRight);
+        btnAlignRight.setOnClickListener(v -> textAlign(Gravity.END));
+
+        ImageButton btnAlignCenter = findViewById(R.id.btnAlignCenter);
+        btnAlignCenter.setOnClickListener(v -> textAlign(Gravity.CENTER_HORIZONTAL));
+
+        ImageButton btnTextBold = findViewById(R.id.btnTextBold);
+        btnTextBold.setOnClickListener(v -> textStyle(Typeface.BOLD));
+
+        ImageButton btnTextItalic = findViewById(R.id.btnTextItalic);
+        btnTextItalic.setOnClickListener(v -> textStyle(Typeface.ITALIC));
+
+        ImageButton btnTextUnderlined = findViewById(R.id.btnTextUnderlined);
+        btnTextUnderlined.setOnClickListener(v -> toggleUnderline());
+
+        ImageButton btnTextNormal = findViewById(R.id.btnTextNormal);
+        btnTextNormal.setOnClickListener(v -> textStyle(Typeface.NORMAL));
+
+        ImageButton btnRotateElement = findViewById(R.id.btnRotateView);
+        btnRotateElement.setOnClickListener(v -> rotateElement());
+    }
+
+    // ============ UNDO/REDO FUNCTIONALITY ============
+
+    private void pushUndoAction(EditorAction action) {
+        Stack<EditorAction> undoStack = undoStacks.get(currentFold);
+        if (undoStack != null) {
+            undoStack.push(action);
+            // Clear redo stack when new action is added
+            Stack<EditorAction> redoStack = redoStacks.get(currentFold);
+            if (redoStack != null) {
+                redoStack.clear();
+            }
+        }
+    }
+
+    private void undo() {
+        Stack<EditorAction> undoStack = undoStacks.get(currentFold);
+        if (undoStack != null && !undoStack.isEmpty()) {
+            EditorAction action = undoStack.pop();
+            action.undo();
+
+            Stack<EditorAction> redoStack = redoStacks.get(currentFold);
+            if (redoStack != null) {
+                redoStack.push(action);
+            }
+
+            deselectAll();
+            Toast.makeText(this, "Undo", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Nothing to undo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void redo() {
+        Stack<EditorAction> redoStack = redoStacks.get(currentFold);
+        if (redoStack != null && !redoStack.isEmpty()) {
+            EditorAction action = redoStack.pop();
+            action.redo();
+
+            Stack<EditorAction> undoStack = undoStacks.get(currentFold);
+            if (undoStack != null) {
+                undoStack.push(action);
+            }
+
+            deselectAll();
+            Toast.makeText(this, "Redo", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Nothing to redo", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // ============ ADD TEXT ELEMENT ============
+    private void addTextElement() {
+        DraggableTextView textView = new DraggableTextView(this);
+        textView.setHint("Double tap to edit");
+        textView.setTextSize(26);
+        textView.setTextColor(Color.WHITE);
+        textView.setShadowLayer(4, 2, 2, Color.BLACK);
+
+        try {
+            Typeface typeface = ResourcesCompat.getFont(this, R.font.cormorant_garamond_variable);
+            if (typeface != null) {
+                textView.setTypeface(typeface);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Font not found, using default", e);
+        }
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        canvas.post(() -> {
+            int centerX = canvas.getWidth() / 2 - 100;
+            int centerY = canvas.getHeight() / 2 - 50;
+
+            params.leftMargin = Math.max(0, centerX);
+            params.topMargin = Math.max(0, centerY);
+            textView.setLayoutParams(params);
+        });
+
+        makeDraggable(textView);
+
+//      ENABLE THIS ONLY WHEN YOU WANT TO EDIT TEXT BY TEXTVIEW TAP
+        textView.setOnClickListener(v -> {
+            if (System.currentTimeMillis() - textView.lastClickTime < 300) {
+                editText(textView);
+            }
+            textView.lastClickTime = System.currentTimeMillis();
+            selectElement(textView);
+        });
+
+        canvas.addView(textView);
+
+        EditorElement element = new EditorElement("text", textView);
+        Objects.requireNonNull(foldDesigns.get(currentFold)).add(element);
+
+        // Add to undo stack
+        pushUndoAction(new AddElementAction(element, currentFold));
+
+//        selectElement(textView);
+    }
+
+    // ============ DRAGGABLE FUNCTIONALITY ============
+    @SuppressLint("ClickableViewAccessibility")
+    private void makeDraggable(View view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+            private float dX, dY;
+            private float startX, startY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        dX = v.getX() - event.getRawX();
+                        dY = v.getY() - event.getRawY();
+                        startX = v.getX();
+                        startY = v.getY();
+                        selectElement(v);
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float newX = event.getRawX() + dX;
+                        float newY = event.getRawY() + dY;
+
+                        if (canvas.getWidth() > 0 && canvas.getHeight() > 0 &&
+                                v.getWidth() > 0 && v.getHeight() > 0) {
+
+                            newX = Math.max(0, Math.min(newX, canvas.getWidth() - v.getWidth()));
+                            newY = Math.max(0, Math.min(newY, canvas.getHeight() - v.getHeight()));
+
+                            v.setX(newX);
+                            v.setY(newY);
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        if (Math.abs(v.getX() - startX) < 10 && Math.abs(v.getY() - startY) < 10) {
+                            v.performClick();
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    // ============ SELECTION - FIXED POSITION ============
+    private void selectElement(View element) {
+        deselectAll();
+        selectedElement = element;
+
+        element.setBackgroundResource(R.drawable.selection_border);
+        floatingToolbar.setVisibility(View.VISIBLE);
+
+        // Position toolbar ABOVE element with offset
+        ViewGroup.LayoutParams layoutParams = floatingToolbar.getLayoutParams();
+        if (layoutParams instanceof androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
+            androidx.constraintlayout.widget.ConstraintLayout.LayoutParams params =
+                    (androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) layoutParams;
+
+            // Calculate Y position - place ABOVE element with 80dp offset
+            int toolbarY = (int) (element.getY() + canvas.getY() - floatingToolbar.getHeight() - 200);
+
+            // If toolbar goes off top, place it below element
+            if (toolbarY < topToolbar.getHeight() + 20) {
+                toolbarY = (int) (element.getY() + canvas.getY() + element.getHeight() + 20);
+            }
+
+            params.topMargin = toolbarY;
+            floatingToolbar.setLayoutParams(params);
+        }
+    }
+
+    private void deselectAll() {
+        if (selectedElement != null) {
+            selectedElement.setBackground(null);
+            selectedElement = null;
+        }
+        floatingToolbar.setVisibility(View.GONE);
+    }
+
+    // ============ EDIT TEXT ============
+    private void editSelectedText() {
+        if (selectedElement instanceof TextView) {
+            editText((TextView) selectedElement);
+        }
+    }
+
+    private void editText(TextView textView) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Text");
+
+        final EditText input = new EditText(this);
+        input.setText(textView.getText());
+        input.setSelection(input.getText().length());
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            textView.setText(input.getText().toString());
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    // ============ FONT PICKER ============
+    private void showFontPicker() {
+        if (!(selectedElement instanceof TextView)) return;
+
+        String[] fonts = {
+                "Great Vibes (Script)",
+                "Cormorant Garamond (Serif)",
+                "Poppins (Sans-serif)",
+                "Cinzel Decorative (Ornate)",
+                "Noto Serif Devanagari (Hindi)"
+        };
+
+        int[] fontResources = {
+                R.font.great_vibes_regular,
+                R.font.cormorant_garamond_variable,
+                R.font.poppins_regular,
+                R.font.cinzel_decorative_regular,
+                R.font.noto_serif_variable
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Font");
+        builder.setItems(fonts, (dialog, which) -> {
+            TextView tv = (TextView) selectedElement;
+            Typeface typeface = ResourcesCompat.getFont(this, fontResources[which]);
+            if (typeface != null) {
+                tv.setTypeface(typeface);
+            }
+        });
+        builder.show();
+    }
+
+    // ============ COLOR PICKER ============
+    private void showColorPicker() {
+        if (!(selectedElement instanceof TextView)) return;
+
+        String[] colors = {
+                "White", "Cream", "Gold", "Black", "Red",
+                "Pink", "Purple", "Blue", "Green", "Orange"
+        };
+
+        int[] colorValues = {
+                Color.WHITE, Color.parseColor("#FFF8DC"), Color.parseColor("#FFD700"),
+                Color.BLACK, Color.RED, Color.parseColor("#FFC0CB"),
+                Color.parseColor("#800080"), Color.BLUE, Color.GREEN, Color.parseColor("#FF8C00")
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Color");
+        builder.setItems(colors, (dialog, which) -> {
+            TextView tv = (TextView) selectedElement;
+            tv.setTextColor(colorValues[which]);
+        });
+        builder.show();
+    }
+
+    // ============ SIZE PICKER ============
+    @SuppressLint("SetTextI18n")
+    private void showSizePicker() {
+        if (!(selectedElement instanceof TextView)) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_size_picker, null);
+
+        SeekBar seekBar = dialogView.findViewById(R.id.sizeSeekBar);
+        TextView preview = dialogView.findViewById(R.id.sizePreview);
+
+        TextView tv = (TextView) selectedElement;
+        int currentSize = (int) (tv.getTextSize() / getResources().getDisplayMetrics().scaledDensity);
+        seekBar.setProgress(currentSize - 10);
+        preview.setText(currentSize + "sp");
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int size = progress + 10;
+                preview.setText(size + "sp");
+                tv.setTextSize(size);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        builder.setView(dialogView);
+        builder.setPositiveButton("Done", null);
+        builder.show();
+    }
+
+    // ============ ELEMENT PICKER ============
+    private void showElementPicker() {
+        String[] elements = {
+                "🕉️ Om Symbol", "🙏 Namaste Hands", "💐 Flower", "✨ Sparkles",
+                "💍 Wedding Rings", "🎂 Cake", "🎉 Party Popper", "❤️ Heart"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Element");
+        builder.setItems(elements, (dialog, which) -> addEmojiElement(elements[which]));
+        builder.show();
+    }
+
+    private void addEmojiElement(String emoji) {
+        String emojiChar = emoji.split(" ")[0];
+
+        DraggableTextView emojiView = new DraggableTextView(this);
+        emojiView.setText(emojiChar);
+        emojiView.setTextSize(48);
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        canvas.post(() -> {
+            int centerX = canvas.getWidth() / 2 - 50;
+            int centerY = canvas.getHeight() / 2 - 50;
+
+            params.leftMargin = Math.max(0, centerX);
+            params.topMargin = Math.max(0, centerY);
+            emojiView.setLayoutParams(params);
+        });
+
+        makeDraggable(emojiView);
+        emojiView.setOnClickListener(v -> selectElement(emojiView));
+
+        canvas.addView(emojiView);
+
+        EditorElement element = new EditorElement("emoji", emojiView);
+        foldDesigns.get(currentFold).add(element);
+
+        pushUndoAction(new AddElementAction(element, currentFold));
+
+        selectElement(emojiView);
+    }
+
+    // ============ ELEMENT PICKER ============
+    private void showBackgroundPicker() {
+        String[] themes = {
+                "Royal Gold 🟡", "Elegant Ivory 🤍", "Lavender Dreams 💜",
+                "Crimson Passion ❤️", "Blush Pink 🌸"
+        };
+
+        String[] themeKeys = {"royal", "elegant", "lavender", "crimson", "blush"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Background");
+        builder.setItems(themes, (dialog, which) -> {
+            theme = themeKeys[which];
+//            loadBackground(theme, currentFold);
+        });
+        builder.show();
+    }
+
+    // ============ FOLD SELECTOR - WITH PRESERVATION ============
+    private void showFoldSelector() {
+        String[] folds = {"Front", "Left", "Right", "Back"};
+        String[] foldKeys = {"front", "left", "right", "back"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Switch to Fold");
+        builder.setItems(folds, (dialog, which) -> {
+            saveFoldDesign(currentFold);
+            currentFold = foldKeys[which];
+            loadFoldDesign(currentFold);
+            loadBackground(theme, currentFold);
+        });
+        builder.show();
+    }
+
+    private void saveFoldDesign(String fold) {
+        List<EditorElement> elements = foldDesigns.get(fold);
+        if (elements != null) {
+            for (EditorElement element : elements) {
+                element.updatePosition();
+                element.updateProperties();
+            }
+        }
+    }
+
+    private void loadFoldDesign(String fold) {
+        // Clear canvas
+        canvas.removeAllViews();
+        canvas.addView(backgroundImage, 0);
+
+        // Load elements for this fold
+        List<EditorElement> elements = foldDesigns.get(fold);
+        if (elements != null) {
+            for (EditorElement element : elements) {
+                canvas.addView(element.view);
+                makeDraggable(element.view);
+                element.view.setOnClickListener(v -> {
+                    if (element.view instanceof DraggableTextView) {
+                        DraggableTextView dtv = (DraggableTextView) element.view;
+                        if (System.currentTimeMillis() - dtv.lastClickTime < 300) {
+                            editText(dtv);
+                        }
+                        dtv.lastClickTime = System.currentTimeMillis();
+                    }
+                    selectElement(element.view);
+                });
+            }
+        }
+
+        deselectAll();
+    }
+
+    // ============ DELETE ACTION ============
+    private void deleteSelected() {
+        if (selectedElement != null) {
+            List<EditorElement> elements = foldDesigns.get(currentFold);
+            EditorElement toDelete = null;
+
+            assert elements != null;
+            for (EditorElement element : elements) {
+                if (element.view == selectedElement) {
+                    toDelete = element;
+                    break;
+                }
+            }
+
+            if (toDelete != null) {
+                pushUndoAction(new DeleteElementAction(toDelete, currentFold));
+                elements.remove(toDelete);
+                canvas.removeView(selectedElement);
+                deselectAll();
+            }
+        }
+    }
+
+    private void bringToFront() {
+        if (selectedElement != null) {
+            selectedElement.bringToFront();
+        }
+    }
+
+    private void duplicateSelectedContent() {
+
+        if (selectedElement == null) return;
+
+        View original = selectedElement;
+        View duplicate = null;
+
+        // ================= TEXT / EMOJI =================
+        if (original instanceof DraggableTextView) {
+
+            DraggableTextView src = (DraggableTextView) original;
+            DraggableTextView copy = new DraggableTextView(this);
+
+            copy.setText(src.getText());
+            copy.setTextSize(TypedValue.COMPLEX_UNIT_PX, src.getTextSize());
+            copy.setTextColor(src.getCurrentTextColor());
+            copy.setTypeface(src.getTypeface());
+            copy.setShadowLayer(4, 2, 2, Color.BLACK);
+
+            duplicate = copy;
+        }
+
+        // ================= IMAGE =================
+        else if (original instanceof ImageView) {
+
+            ImageView src = (ImageView) original;
+            ImageView copy = new ImageView(this);
+
+            copy.setImageDrawable(src.getDrawable());
+            copy.setScaleType(src.getScaleType());
+
+            duplicate = copy;
+        }
+
+        if (duplicate == null) return;
+
+        // ================= COMMON PROPERTIES =================
+
+        FrameLayout.LayoutParams params =
+                new FrameLayout.LayoutParams(original.getWidth(), original.getHeight());
+
+        params.leftMargin = (int) original.getX() + 30;
+        params.topMargin = (int) original.getY() + 30;
+
+        duplicate.setLayoutParams(params);
+
+        duplicate.setRotation(original.getRotation());
+        duplicate.setScaleX(original.getScaleX());
+        duplicate.setScaleY(original.getScaleY());
+
+        // Make draggable + selectable
+        makeDraggable(duplicate);
+
+        duplicate.setOnClickListener(this::selectElement);
+
+        // Add to canvas
+        canvas.addView(duplicate);
+
+        // Register in fold design
+        EditorElement element = new EditorElement(
+                original instanceof ImageView ? "image" : "text",
+                duplicate
+        );
+
+        Objects.requireNonNull(foldDesigns.get(currentFold)).add(element);
+
+        // Undo support
+        pushUndoAction(new AddElementAction(element, currentFold));
+
+        // Select new element
+        selectElement(duplicate);
+    }
+
+    private void textAlign(int gravity) {
+        if (!(selectedElement instanceof TextView)) return;
+
+        DraggableTextView tv = (DraggableTextView) selectedElement;
+        tv.setGravity(gravity);
+    }
+
+    private void textStyle(int style) {
+        if (!(selectedElement instanceof TextView)) return;
+
+        DraggableTextView tv = (DraggableTextView) selectedElement;
+        tv.setTypeface(null, style);
+    }
+
+    private void toggleUnderline() {
+        if (!(selectedElement instanceof DraggableTextView)) return;
+
+        DraggableTextView tv = (DraggableTextView) selectedElement;
+        int flags = tv.getPaintFlags();
+        if ((flags & Paint.UNDERLINE_TEXT_FLAG) != 0) {
+            tv.setPaintFlags(flags & ~Paint.UNDERLINE_TEXT_FLAG);
+        } else {
+            tv.setPaintFlags(flags | Paint.UNDERLINE_TEXT_FLAG);
+        }
+    }
+
+    private void rotateElement(){
+        if (!(selectedElement instanceof DraggableTextView)) return;
+        DraggableTextView tv = (DraggableTextView) selectedElement;
+        float sx = selectedElement.getScaleX();
+        tv.setScaleX(-sx);
+    }
+
+    // ============ GENERATE WEDCARD ============
+    private void generateWedCard() {
+        new AlertDialog.Builder(this)
+                .setTitle("Generate Card")
+                .setMessage("This will create your wedding card file. Continue?")
+                .setPositiveButton("Generate", (dialog, which) -> {
+                    Toast.makeText(this, "Generating card...", Toast.LENGTH_SHORT).show();
+                    new Thread(this::captureAndSaveAllFolds).start();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    private void showGenerateOptions() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Export Card");
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_export_options, null);
+
+        Button btnPdf = view.findViewById(R.id.btnExportPdf);
+        Button btnWedcard = view.findViewById(R.id.btnExportWedcard);
+
+        btnPdf.setOnClickListener(v -> {
+            dialogDismiss(builder);
+            Toast.makeText(this, "Exporting PDF...", Toast.LENGTH_SHORT).show();
+            new Thread(this::exportAsPdf).start();
+        });
+
+        btnWedcard.setOnClickListener(v -> {
+            dialogDismiss(builder);
+            Toast.makeText(this, "Generating wedcard...", Toast.LENGTH_SHORT).show();
+            new Thread(this::captureAndSaveAllFolds).start();
+        });
+
+        builder.setView(view);
+        builder.show();
+    }
+
+    private void dialogDismiss(AlertDialog.Builder builder) {
+        // helper – safely close dialog
+    }
+
+    private void exportAsPdf() {
+        try {
+            HashMap<String, Bitmap> foldBitmaps = new HashMap<>();
+            String[] folds = {"front", "left", "right", "back"};
+
+            saveFoldDesign(currentFold);
+
+            for (String fold : folds) {
+                runOnUiThread(() -> {
+                    loadFoldDesign(fold);
+                    loadBackground(theme, fold);
+                });
+
+                Thread.sleep(300);
+
+                Bitmap bmp = captureFold();
+                if (bmp != null) foldBitmaps.put(fold, bmp);
+            }
+
+            runOnUiThread(() -> {
+                loadFoldDesign(currentFold);
+                loadBackground(theme, currentFold);
+            });
+
+            createPdfFromBitmaps(foldBitmaps);
+
+        } catch (Exception e) {
+            Log.e(TAG, "PDF export failed", e);
+        }
+    }
+
+    private void createPdfFromBitmaps(HashMap<String, Bitmap> foldBitmaps) throws Exception {
+
+        PdfDocument document = new PdfDocument();
+
+        String[] order = {"front", "left", "right", "back"};
+
+        for (int i = 0; i < order.length; i++) {
+
+            Bitmap bmp = foldBitmaps.get(order[i]);
+            if (bmp == null) continue;
+
+            PdfDocument.PageInfo pageInfo =
+                    new PdfDocument.PageInfo.Builder(bmp.getWidth(), bmp.getHeight(), i + 1).create();
+
+            PdfDocument.Page page = document.startPage(pageInfo);
+            page.getCanvas().drawBitmap(bmp, 0, 0, null);
+            document.finishPage(page);
+        }
+
+        String fileName = "WeddingCard_" + System.currentTimeMillis() + ".pdf";
+
+        File pdfFile = new File(getCacheDir(), fileName);
+        FileOutputStream fos = new FileOutputStream(pdfFile);
+        document.writeTo(fos);
+        document.close();
+        fos.close();
+
+        savePdfToDocuments(pdfFile, fileName);
+    }
+
+    private void savePdfToDocuments(File temp, String name) throws Exception {
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DOCUMENTS + "/WeddingCraft");
+
+        Uri uri = getContentResolver()
+                .insert(MediaStore.Files.getContentUri("external"), values);
+
+        try (OutputStream out = getContentResolver().openOutputStream(uri);
+             FileInputStream in = new FileInputStream(temp)) {
+
+            byte[] buf = new byte[4096];
+            int len;
+            while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+        }
+
+        runOnUiThread(this::showGoToMyCards);
+    }
+
+    private void showGoToMyCards() {
+
+        Button btn = findViewById(R.id.btnGoToMyCards);
+        btnGenerate.setVisibility(View.GONE);
+        btn.setVisibility(View.VISIBLE);
+
+        btn.setOnClickListener(v -> {
+            startActivity(new Intent(this, MyCards.class));
+            finish();
+        });
+
+        Toast.makeText(this, "Card generated successfully", Toast.LENGTH_LONG).show();
+    }
+
+
+    private void captureAndSaveAllFolds() {
+        try {
+            HashMap<String, Bitmap> foldBitmaps = new HashMap<>();
+            String[] folds = {"front", "left", "right", "back"};
+
+            // Save current fold first
+            saveFoldDesign(currentFold);
+
+            for (String fold : folds) {
+                runOnUiThread(() -> {
+                    loadFoldDesign(fold);
+                    loadBackground(theme, fold);
+                });
+
+                Thread.sleep(300); // Wait for UI update
+
+                Bitmap foldBitmap = captureFold();
+                if (foldBitmap != null) {
+                    foldBitmaps.put(fold, foldBitmap);
+                }
+            }
+
+            // Restore current fold
+            runOnUiThread(() -> {
+                loadFoldDesign(currentFold);
+                loadBackground(theme, currentFold);
+            });
+
+            // Create wedcard file
+            createWedCardFile(foldBitmaps);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error generating card", e);
+            runOnUiThread(() -> Toast.makeText(this, "Failed to generate card", Toast.LENGTH_SHORT).show());
+        }
+    }
+
+    private Bitmap captureFold() {
+        try {
+            canvas.setDrawingCacheEnabled(true);
+            canvas.buildDrawingCache();
+            Bitmap bitmap = Bitmap.createBitmap(canvas.getDrawingCache());
+            canvas.setDrawingCacheEnabled(false);
+            return bitmap;
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to capture fold", e);
+            return null;
+        }
+    }
+
+    private void createWedCardFile(HashMap<String, Bitmap> foldBitmaps) {
+        try {
+            String fileName = "CustomCard_" + System.currentTimeMillis() + ".wedcard";
+            File tempFile = new File(getCacheDir(), fileName);
+
+            try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(tempFile.toPath())))) {
+                // Create proper card.json that CardViewer expects
+                JSONObject cardJson = new JSONObject();
+                cardJson.put("theme", theme);
+                cardJson.put("event_type", eventType != null ? eventType : "Custom");
+
+                // Create folds array - REQUIRED by CardViewer
+                JSONArray foldsArray = new JSONArray();
+
+                String[] foldNames = {"front", "left", "right", "back"};
+                String[] foldTypes = {"cover", "content", "content", "back"};
+
+                JSONObject fold = new JSONObject();
+                for (int i = 0; i < foldNames.length; i++) {
+                    fold.put("fold", foldNames[i]);
+                    fold.put("type", foldTypes[i]);
+                    fold.put("image", "images/" + foldNames[i] + ".jpg");
+
+                    // Create blocks array with a simple text block
+                    // Since the design is rendered in images, we just need placeholder
+                    JSONArray blocks = new JSONArray();
+                    JSONObject textBlock = new JSONObject();
+                    textBlock.put("type", "text");
+                    textBlock.put("content", ""); // Empty - design is in image
+                    blocks.put(textBlock);
+
+                    fold.put("blocks", blocks);
+                    foldsArray.put(fold);
+                }
+
+                cardJson.put("folds", foldsArray);
+
+                // Add creation timestamp
+                cardJson.put("created", System.currentTimeMillis());
+
+                ZipEntry jsonEntry = new ZipEntry("card.json");
+                zos.putNextEntry(jsonEntry);
+                zos.write(cardJson.toString(4).getBytes());
+                zos.closeEntry();
+
+                // Add fold images
+                for (String foldName : foldNames) {
+                    Bitmap bitmap = foldBitmaps.get(foldName);
+                    if (bitmap != null) {
+                        ZipEntry imgEntry = new ZipEntry("images/" + foldName + ".jpg");
+                        zos.putNextEntry(imgEntry);
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+                        zos.write(baos.toByteArray());
+                        zos.closeEntry();
+                    }
+                }
+            }
+
+            // Save to storage
+            saveToStorage(tempFile, fileName);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to create wedcard", e);
+            runOnUiThread(() -> Toast.makeText(this, "Failed to save card", Toast.LENGTH_SHORT).show());
+        }
+    }
+
+    private void saveToStorage(File tempFile, String fileName) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+                values.put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream");
+                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS + "/WeddingCraft/wedcards");
+
+                ContentResolver resolver = getContentResolver();
+                Uri uri = resolver.insert(MediaStore.Files.getContentUri("external"), values);
+
+                if (uri != null) {
+                    try (OutputStream out = resolver.openOutputStream(uri);
+                         FileInputStream in = new FileInputStream(tempFile)) {
+                        byte[] buffer = new byte[4096];
+                        int len;
+                        while ((len = in.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
+                        }
+                    }
+                }
+            } else {
+                File outDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "WeddingCraft/wedcards");
+                if (!outDir.exists()) outDir.mkdirs();
+
+                File outFile = new File(outDir, fileName);
+                try (FileInputStream in = new FileInputStream(tempFile);
+                     FileOutputStream out = new FileOutputStream(outFile)) {
+                    byte[] buffer = new byte[4096];
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, len);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to save card", e);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to save card", e);
+        }
+    }
+
+    interface EditorAction {
+        void undo();
+
+        void redo();
+    }
+
+    class AddElementAction implements EditorAction {
+        private final EditorElement element;
+        private final String fold;
+
+        AddElementAction(EditorElement element, String fold) {
+            this.element = element;
+            this.fold = fold;
+        }
+
+        @Override
+        public void undo() {
+            foldDesigns.get(fold).remove(element);
+            if (element.view.getParent() != null) {
+                canvas.removeView(element.view);
+            }
+        }
+
+        @Override
+        public void redo() {
+            foldDesigns.get(fold).add(element);
+            canvas.addView(element.view);
+        }
+    }
+
+    class DeleteElementAction implements EditorAction {
+        private final EditorElement element;
+        private final String fold;
+
+        DeleteElementAction(EditorElement element, String fold) {
+            this.element = element;
+            this.fold = fold;
+        }
+
+        @Override
+        public void undo() {
+            foldDesigns.get(fold).add(element);
+            canvas.addView(element.view);
+        }
+
+        @Override
+        public void redo() {
+            foldDesigns.get(fold).remove(element);
+            canvas.removeView(element.view);
+        }
+    }
+}
