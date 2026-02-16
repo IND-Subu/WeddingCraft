@@ -1,34 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Delete Account - WeddingCraft</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delete Account | WeddingCraft</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ffe4ec, #fff5f8);
+    color: #444;
+}
+
+.container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.header {
+    text-align: center;
+}
+
+.header h1 {
+    color: #e91e63;
+    margin-bottom: 10px;
+}
+
+.icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.section {
+    margin-top: 25px;
+}
+
+.section h3 {
+    color: #e91e63;
+    margin-bottom: 10px;
+}
+
+.steps {
+    background: #fff0f5;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.steps li {
+    margin-bottom: 8px;
+}
+
+.email-box {
+    background: #f8f8f8;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #e91e63;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 13px;
+    color: #888;
+}
+
+button {
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+button:hover {
+    background: #d81b60;
+}
+
+</style>
 </head>
-<body style="font-family: Arial; padding: 20px;">
 
-<h2>Delete Your WeddingCraft Account</h2>
+<body>
 
-<p>You can delete your WeddingCraft account at any time.</p>
+<div class="container">
 
-<h3>How to Delete</h3>
-<ol>
-    <li>Open the WeddingCraft app</li>
-    <li>Go to Menu → Settings</li>
-    <li>Tap "Delete Account"</li>
-    <li>Confirm deletion</li>
-</ol>
+    <div class="header">
+        <div class="icon">💍</div>
+        <h1>Delete Your Account</h1>
+        <p>We’re sorry to see you go from WeddingCraft 💔</p>
+    </div>
 
-<p>If you cannot access the app, you can request deletion by contacting:</p>
+    <div class="section">
+        <h3>How to Delete Your Account</h3>
 
-<p><b>Email:</b> your@email.com</p>
+        <ol class="steps">
+            <li>Open the <b>WeddingCraft</b> app</li>
+            <li>Go to <b>Menu → Settings</b></li>
+            <li>Tap <b>Delete Account</b></li>
+            <li>Confirm your request</li>
+        </ol>
 
-<h3>What Happens When You Delete</h3>
-<ul>
-    <li>Your account information will be permanently deleted</li>
-    <li>Your phone number will be removed from authentication records</li>
-    <li>All locally stored wedding data remains only on your device</li>
-</ul>
+        <button disabled>Delete inside App</button>
+    </div>
 
-<p>Some data may be retained temporarily for legal or security purposes.</p>
+    <div class="section">
+        <h3>Can't Access the App?</h3>
+        <p>You can request account deletion manually by contacting us:</p>
+
+        <div class="email-box">
+            support@yourdomain.com
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>What Happens After Deletion?</h3>
+
+        <ul>
+            <li>Your account and phone authentication data will be permanently removed.</li>
+            <li>Your personal information stored in our systems will be deleted.</li>
+            <li>Wedding data stored locally on your device will remain unless you uninstall the app.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h3>Data Retention</h3>
+        <p>
+            We do not retain personal data after account deletion except where required
+            for legal or security purposes.
+        </p>
+    </div>
+
+    <div class="footer">
+        © 2026 WeddingCraft — Made with ❤️ for your special day
+    </div>
+
+</div>
 
 </body>
 </html>
